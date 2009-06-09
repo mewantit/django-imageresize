@@ -1,5 +1,4 @@
 from __future__ import with_statement
-from djangosanetesting.cases import UnitTestCase
 from imageservice import views, imagemagick
 from nose.tools import raises
 from django.http import Http404
@@ -7,9 +6,10 @@ import settings
 import os
 import tempfile
 import shutil
+import unittest
 from contextlib import contextmanager
 
-class ImageMagickResizeTest(UnitTestCase):
+class ImageMagickResizeTest(unittest.TestCase):
     
     def setUp(self):
         self.source = settings.TEST_MEDIA_ROOT + '/test.png'
@@ -41,7 +41,7 @@ class ImageMagickResizeTest(UnitTestCase):
         imagemagick.resize(self.source, self.target, 320, 200)
         time = os.path.getmtime(self.target)
         imagemagick.resize(self.source, self.target, 320, 200)
-        self.assert_equals(time, os.path.getmtime(self.target))
+        self.assertEquals(time, os.path.getmtime(self.target))
     
     @raises(IOError)    
     def test_should_raise_exception_if_source_file_is_missing(self):
@@ -60,9 +60,9 @@ class ImageMagickResizeTest(UnitTestCase):
 
         imagemagick.temp_file = mock_temp_file
         imagemagick.resize(self.source, self.target, 320, 200)
-        self.assert_true(os.path.isfile(temp_file))
+        self.assertTrue(os.path.isfile(temp_file))
         
-class TemporaryFileTest(UnitTestCase):
+class TemporaryFileTest(unittest.TestCase):
    
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp()
@@ -80,14 +80,14 @@ class TemporaryFileTest(UnitTestCase):
     def test_should_work_on_temp_file(self): 
         with imagemagick.temp_file(self.target) as result:
             open(result, 'w').write("hello")
-            self.assert_equals(self.temp_file, result)
-            self.assert_true(os.path.isfile(self.temp_file))
+            self.assertEquals(self.temp_file, result)
+            self.assertTrue(os.path.isfile(self.temp_file))
     
     def test_should_replace_target_with_temp_file(self): 
         with imagemagick.temp_file(self.target) as result:
             open(result, 'w').write("hello")
         
-        self.assert_equals("hello", open(self.target, 'r').read())
+        self.assertEquals("hello", open(self.target, 'r').read())
         
     def test_should_overwrite_target_file_if_already_exists(self):
         open(self.target,'w').write("good bye")
@@ -95,13 +95,13 @@ class TemporaryFileTest(UnitTestCase):
         with imagemagick.temp_file(self.target) as result:
             open(result, 'w').write("hello")
         
-        self.assert_equals("hello", open(self.target, 'r').read())
+        self.assertEquals("hello", open(self.target, 'r').read())
         
     def test_should_remove_tempfile_after_done(self):
         with imagemagick.temp_file(self.target) as result:
             open(result, 'w').write("hello")
                         
-        self.assert_false(os.path.isfile(self.temp_file))
+        self.assertFalse(os.path.isfile(self.temp_file))
         
     def test_should_remove_tempfile_if_failing(self):
         
@@ -111,16 +111,16 @@ class TemporaryFileTest(UnitTestCase):
                 raise Exception
                 
         except Exception:
-            self.assert_false(os.path.isfile(self.temp_file))
+            self.assertFalse(os.path.isfile(self.temp_file))
         
     def test_should_keep_fileending_of_target_file(self):
         tempfile.mkstemp = self.old_mkstemp
         with imagemagick.temp_file(self.target) as result:
-            self.assert_equals(self.target.split('.')[-1], result.split('.')[-1])
+            self.assertEquals(self.target.split('.')[-1], result.split('.')[-1])
             open(result, 'w').write("hello")
                 
         
-class ResizeImageViewTest(UnitTestCase):
+class ResizeImageViewTest(unittest.TestCase):
     
     def setUp(self):
         self.file_name_without_extension = "/dir1/dir2/hello"
@@ -178,11 +178,11 @@ class ResizeImageViewTest(UnitTestCase):
     
     def test_should_fetch_source_image_from_media_root(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
-        self.assert_true(result['target_file'].startswith(settings.MEDIA_ROOT))
+        self.assertTrue(result['target_file'].startswith(settings.MEDIA_ROOT))
     
     def test_should_store_resized_image_under_cached_media_root(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
-        self.assert_true(result['target_file'].startswith(settings.MEDIA_CACHE_ROOT))
+        self.assertTrue(result['target_file'].startswith(settings.MEDIA_CACHE_ROOT))
    
     def test_the_paths_of_source_and_resized_image_should_be_the_same_except_for_their_root_path(self):
         self.old_media_cache_root = settings.MEDIA_CACHE_ROOT
@@ -193,7 +193,7 @@ class ResizeImageViewTest(UnitTestCase):
             (source_path, _) = os.path.split(result['source_file'])
             (target_path, _) = os.path.split(result['target_file'])
         
-            self.assert_equals(source_path, target_path)
+            self.assertEquals(source_path, target_path)
         
         finally:
             settings.MEDIA_CACHE_ROOT = self.old_media_cache_root
@@ -204,24 +204,24 @@ class ResizeImageViewTest(UnitTestCase):
             (_, source_file) = os.path.split(result['source_file'])
             (_, target_file) = os.path.split(result['target_file'])
         
-            self.assert_equals(source_file.split('.')[0], target_file.split('.')[0])
+            self.assertEquals(source_file.split('.')[0], target_file.split('.')[0])
     
     def test_file_extension_of_source_and_resized_image_should_be_the_same(self):
             result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
             (_, source_file) = os.path.split(result['source_file'])
             (_, target_file) = os.path.split(result['target_file'])
         
-            self.assert_equals(source_file.split('.')[-1], target_file.split('.')[-1])
+            self.assertEquals(source_file.split('.')[-1], target_file.split('.')[-1])
     
     
     def test_should_append_image_size_to_resized_image(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
         (_, file_name) = os.path.split(result['target_file'])
-        self.assert_equals("hello.100x200.png", file_name)
+        self.assertEquals("hello.100x200.png", file_name)
    
     def test_should_render_resized_image_to_http_response(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
-        self.assert_true(result['rendered_to_http_response'])
+        self.assertTrue(result['rendered_to_http_response'])
     
             
             
@@ -232,7 +232,7 @@ class MockFile(object):
     def read(self):
         return ["mocked_binary:", self.file_name]
 
-class RenderImageToResponseTest(UnitTestCase):
+class RenderImageToResponseTest(unittest.TestCase):
     
     def setUp(self):
         self.old_open = views._open
@@ -243,8 +243,8 @@ class RenderImageToResponseTest(UnitTestCase):
     
     def test_should_inlude_file_data_in_response_content(self):
         result = views.render_image_to_response("foo.jpg")
-        self.assert_equals("mocked_binary:foo.jpg", result.content)
+        self.assertEquals("mocked_binary:foo.jpg", result.content)
 
     def test_should_have_image_as_content_type(self):
         result = views.render_image_to_response("foo.jpg")
-        self.assert_equals("image/jpg", result['content-type'])
+        self.assertEquals("image/jpg", result['content-type'])
