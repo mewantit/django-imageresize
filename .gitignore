@@ -1,0 +1,8 @@
+*.pyc
+~*
+*~
+.project
+.pydevproject
+pip-log.txt
+*/ENV
+.DS_Store
