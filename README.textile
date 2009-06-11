@@ -18,6 +18,12 @@ There exists a lot of similar projects/snippets, some with plenty of more functi
 * "sorl-thumbnail":http://code.google.com/p/sorl-thumbnail/
 * "Thumbnail":http://code.google.com/p/django-utils/wiki/Thumbnail
 
+h2. Version history
+
+h3. 0.1
+
+First version. Fully working, but not tested in a production environment.
+
 h2. Getting started
 
 h3. Install imagemagick
@@ -26,7 +32,7 @@ Download and install Imagemagick from "Imagemagick official homepage":http://www
 
 h3. Install django-imagemagick
 
-For now you need to install from source. Download the source from GitHub http://github.com/mewantit/django-imagemagick/tree/master
+For now you need to install from source. Download the source from GitHub http://github.com/mewantit/django-imagemagick/downloads
 
 In source directory run: <pre>> easy_install .</pre>
 
