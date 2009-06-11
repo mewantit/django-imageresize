@@ -32,7 +32,7 @@ Download and install Imagemagick from "Imagemagick official homepage":http://www
 
 h3. Install django-imagemagick
 
-For now you need to install from source. Download the source from GitHub http://github.com/mewantit/django-imagemagick/downloads
+For now you need to install from source. Download the source from GitHub's "downloads page.":http://github.com/mewantit/django-imagemagick/downloads
 
 In source directory run: <pre>> easy_install .</pre>
 
