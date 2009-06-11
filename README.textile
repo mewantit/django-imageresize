@@ -2,7 +2,9 @@ h1. Django-imagemagick
 
 h2. Introduction
 
-Django-imagemagick is an extension to the Django web framework that lets you resize images on server side just by specifying the size in the url. If you want to resize an image, @foo.png@, to 100x100 you simply just use the url @foo.100x100.png@ which makes it very easy to create for example thumbnails. The benefits of django-imagemagick are:
+Django-imagemagick is an extension to the Django web framework that lets you resize images on server side just by specifying the size in the url. If you want to resize an image, @foo.png@, to 100x100 you simply just use the url @foo.100x100.png@ which makes it very easy to create for example thumbnails. 
+
+The benefits of django-imagemagick are:
 
 * Size is specified in link only, no dependecy on django templates
 * Images are resized using "Imagemagick":http://www.imagemagick.org which delivers excellent quality
@@ -11,10 +13,10 @@ Django-imagemagick is an extension to the Django web framework that lets you res
 
 h3. Similar projects
 
-There exists a lot of similar projects/snippets, some with a lot of more functions, but they tend to rely on the django template language which is something we wanted to avoid. Some examples:
+There exists a lot of similar projects/snippets, some with plenty of more functions, but they tend to rely on the django template language which is something we wanted to avoid. Some examples:
 
-"sorl-thumbnail":http://code.google.com/p/sorl-thumbnail/
-"Thumbnail":http://code.google.com/p/django-utils/wiki/Thumbnail
+* "sorl-thumbnail":http://code.google.com/p/sorl-thumbnail/
+* "Thumbnail":http://code.google.com/p/django-utils/wiki/Thumbnail
 
 h2. Getting started
 
