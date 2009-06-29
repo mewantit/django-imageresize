@@ -3,6 +3,7 @@ from __future__ import with_statement
 import os
 import subprocess
 import tempfile
+import shutil
 
 from contextlib import contextmanager
 
@@ -58,7 +59,7 @@ def _create_tempfile_for_target(target):
     return temp_file
 
 def _replace_target_file_with_temp_file(temp_file, target):    
-    os.rename(temp_file, target)
+    shutil.move(temp_file, target)
     
 def _remove_tempfile(temp_file):
     if temp_file and os.path.isfile(temp_file):
