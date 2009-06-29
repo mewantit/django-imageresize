@@ -1,6 +1,6 @@
 from django.http import HttpResponse, Http404
 import imagemagick
-import settings
+from django.conf import settings
 
 def resize_image(request, file_name_without_extension, width, height, file_extension):
     width = int(width)

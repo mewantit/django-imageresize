@@ -1,17 +1,26 @@
 from __future__ import with_statement
+import os
 from imageservice import views, imagemagick
 from nose.tools import raises
 from django.http import Http404
-import settings
 import os
 import tempfile
 import shutil
 import unittest
 from contextlib import contextmanager
 
+from django.conf import settings
+root = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
+settings.configure(RESIZE_MAX_HEIGHT=2048,RESIZE_MAX_WIDTH=2048,
+                   MEDIA_ROOT="",
+                   MEDIA_CACHE_ROOT="",
+                   TEST_MEDIA_ROOT=os.path.join(root, 'test_media'))
+
+
 class ImageMagickResizeTest(unittest.TestCase):
     
     def setUp(self):
+        
         self.source = settings.TEST_MEDIA_ROOT + '/test.png'
         self.tmp_dir = tempfile.mkdtemp()
         self.target = self.tmp_dir + '/target.png'
