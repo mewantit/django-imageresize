@@ -1,0 +1,60 @@
+h1. Django-imagemagick
+
+h2. Introduction
+
+Django-imagemagick is an extension to the Django web framework that lets you resize images on server side just by specifying the size in the url. If you want to resize an image, @foo.png@, to 100x100 you simply just use the url @foo.100x100.png@ which makes it very easy to create for example thumbnails. 
+
+The benefits of django-imagemagick are:
+
+* Size is specified in link only, no dependecy on django templates
+* Images are resized using "Imagemagick":http://www.imagemagick.org which delivers excellent quality
+* Resized images are cached on disk to improve performance.
+* No performance degradation after first resize if using content distribution networks like "Akamai":http://www.akamai.com/
+
+h3. Similar projects
+
+There exists a lot of similar projects/snippets, some with plenty of more functions, but they tend to rely on the django template language which is something we wanted to avoid. Some examples:
+
+* "sorl-thumbnail":http://code.google.com/p/sorl-thumbnail/
+* "Thumbnail":http://code.google.com/p/django-utils/wiki/Thumbnail
+
+h2. Version history
+
+h3. 0.1
+
+First version. Fully working, but not tested in a production environment.
+
+h2. Getting started
+
+h3. Install imagemagick
+
+Download and install Imagemagick from "Imagemagick official homepage":http://www.imagemagick.org
+
+h3. Install django-imagemagick
+
+For now you need to install from source. Download the source from GitHub's "downloads page.":http://github.com/mewantit/django-imagemagick/downloads
+
+In source directory run: <pre>> easy_install .</pre>
+
+h3. Add the django-imagemagick imageservice to your django application
+
+Add the @imageservice@ to the installed apps in your django application's @settings.py@:
+
+<pre>
+INSTALLED_APPS = (
+    ... 
+   'imageservice',
+    ...
+)
+</pre>
+
+In same file, configure the cache root (this is where the resized images will be stored):
+<pre>
+MEDIA_CACHE_ROOT = "/path/to/store/cached/images/"
+</pre>
+
+And the max allowed size:
+<pre>
+RESIZE_MAX_WIDTH = 2048
+RESIZE_MAX_HEIGHT = 2048
+</pre>
