@@ -19,7 +19,7 @@ def resize(src, target, width, height):
     
     """
     if not os.path.isfile(src):
-        raise IOError("Source image not found")
+        raise IOError("Source image not found: %s" % src)
     
     if not os.path.isfile(target):
         (target_path, _) = os.path.split(target)
