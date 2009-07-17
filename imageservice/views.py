@@ -9,8 +9,8 @@ def resize_image(request, file_name_without_extension, width, height, file_exten
     if height > settings.RESIZE_MAX_HEIGHT or width > settings.RESIZE_MAX_WIDTH:
         raise Http404
     
-    source_file = "%s/%s.%s" % (settings.MEDIA_ROOT, file_name_without_extension, file_extension)
-    target_file = "%s/%s.%dx%d.%s" % (settings.MEDIA_CACHE_ROOT, file_name_without_extension, width, height, file_extension)   
+    source_file = "%s/%s%s" % (settings.MEDIA_ROOT, file_name_without_extension, file_extension)
+    target_file = "%s/%s.%dx%d%s" % (settings.MEDIA_CACHE_ROOT, file_name_without_extension, width, height, file_extension)   
     
     try:
         imagemagick.resize(source_file, target_file, width, height)    

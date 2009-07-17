@@ -1,21 +1,25 @@
 from __future__ import with_statement
-import os
+
 from imageservice import views, imagemagick
 from nose.tools import raises
-from django.http import Http404
 import os
 import tempfile
 import shutil
 import unittest
 from contextlib import contextmanager
-
 from django.conf import settings
 root = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
 settings.configure(RESIZE_MAX_HEIGHT=2048,RESIZE_MAX_WIDTH=2048,
                    MEDIA_ROOT="",
                    MEDIA_CACHE_ROOT="",
-                   TEST_MEDIA_ROOT=os.path.join(root, 'test_media'))
+                   TEST_MEDIA_ROOT=os.path.join(root, 'test_media'),
+                   DATABASE_ENGINE='dummy',
+                   INSTALLED_APP= ("imageservice"),
+                   DEBUG=True,
+                   ROOT_URLCONF='imageservice.urls')
 
+from django.http import Http404, HttpResponse
+from django.test.client import Client
 
 class ImageMagickResizeTest(unittest.TestCase):
     
@@ -133,7 +137,7 @@ class ResizeImageViewTest(unittest.TestCase):
     
     def setUp(self):
         self.file_name_without_extension = "/dir1/dir2/hello"
-        self.file_extension = "png"
+        self.file_extension = ".png"
         self.width = "100"
         self.height = "200"
     
@@ -209,30 +213,33 @@ class ResizeImageViewTest(unittest.TestCase):
 
 
     def test_file_names_of_source_and_resized_image_should_be_the_same_except_for_the_size(self):
-            result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
-            (_, source_file) = os.path.split(result['source_file'])
-            (_, target_file) = os.path.split(result['target_file'])
-        
-            self.assertEquals(source_file.split('.')[0], target_file.split('.')[0])
+        result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
+        (_, source_file) = os.path.split(result['source_file'])
+        (_, target_file) = os.path.split(result['target_file'])
     
+        self.assertEquals(source_file.split('.')[0], target_file.split('.')[0])
+
     def test_file_extension_of_source_and_resized_image_should_be_the_same(self):
-            result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
-            (_, source_file) = os.path.split(result['source_file'])
-            (_, target_file) = os.path.split(result['target_file'])
-        
-            self.assertEquals(source_file.split('.')[-1], target_file.split('.')[-1])
+        result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
+        (_, source_file) = os.path.split(result['source_file'])
+        (_, target_file) = os.path.split(result['target_file'])
     
+        self.assertEquals(source_file.split('.')[-1], target_file.split('.')[-1])
     
     def test_should_append_image_size_to_resized_image(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
         (_, file_name) = os.path.split(result['target_file'])
         self.assertEquals("hello.100x200.png", file_name)
+ 
+    def test_should_support_images_without_file_extension(self):
+        result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, "")
+        (_, file_name) = os.path.split(result['target_file'])
+        self.assertEquals("hello.100x200", file_name)
    
     def test_should_render_resized_image_to_http_response(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
         self.assertTrue(result['rendered_to_http_response'])
-    
-            
+                
             
 class MockFile(object):
     def __init__(self, file_name):
@@ -257,3 +264,49 @@ class RenderImageToResponseTest(unittest.TestCase):
     def test_should_have_image_as_content_type(self):
         result = views.render_image_to_response("foo.jpg")
         self.assertEquals("image/jpg", result['content-type'])
+
+
+class ResizeUrlTest(unittest.TestCase):
+    file_name_without_extension = "test"
+    width = u'100'
+    height = u'200'
+    file_extension = ".jpg"
+    
+    def setUp(self):
+        
+        self.old_resize_image = views.resize_image
+        
+        def mock_resize_image(request, file_name_without_extension, width, height, file_extension):
+            self.assertEquals(self.file_name_without_extension, file_name_without_extension)
+            self.assertEquals(self.width, width)
+            self.assertEquals(self.height, height) 
+            self.assertEquals(self.file_extension, file_extension)
+            return HttpResponse()
+        
+        views.resize_image = mock_resize_image
+        
+        self.client = Client()
+        
+    def tearDown(self):        
+        views.resize_image = self.old_resize_image 
+    
+    def test_should_support_images_with_extensions(self):
+        ResizeUrlTest.file_extension = ".jpg"
+        result = self.client.get("/test.100x200.jpg")
+        self.assertEquals(200, result.status_code)
+        
+    def test_should_support_images_without_extensions(self):
+        ResizeUrlTest.file_extension = ""
+        result = self.client.get("/test.100x200")
+        self.assertEquals(200, result.status_code)
+    
+    def test_should_not_support_images_with_special_characters_in_extension(self):
+        ResizeUrlTest.file_extension = ""
+        result = self.client.get("/test.100x200./")
+        self.assertEquals(404, result.status_code)
+            
+    def test_should_not_support_images_ending_with_dot(self):
+        ResizeUrlTest.file_extension = ""
+        result = self.client.get("/test.100x200.")
+
+        self.assertEquals(404, result.status_code)
