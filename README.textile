@@ -1,4 +1,4 @@
-h1. Django-imageresize
+h1. Django-imagemagick
 
 h2. Introduction
 
