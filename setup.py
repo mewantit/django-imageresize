@@ -20,7 +20,7 @@ for dirpath, dirnames, filenames in os.walk('imageservice'):
         packages.append(pkg)
 
 setup(name='django-imagemagick',
-      version='0.1',
+      version='0.1.1',
       description='Adds the possibility to scale images on server side using imagemagick',
       author='Tobias Hasselrot',
       author_email='tobias.hasselrot@gmail.com',

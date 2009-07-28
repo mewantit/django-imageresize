@@ -20,6 +20,11 @@ There exists a lot of similar projects/snippets, some with plenty of more functi
 
 h2. Version history
 
+h3. 0.1.1
+
+* Fixed settings.py conflict. 
+* Fixed so that it is possible to scale images with no file ending
+
 h3. 0.1
 
 First version. Fully working, but not tested in a production environment.
