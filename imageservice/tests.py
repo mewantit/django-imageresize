@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 from imageservice import views, imagemagick
 from nose.tools import raises
+from imageservice.templatetags.image_service import resize
 import os
 import tempfile
 import shutil
@@ -265,7 +266,6 @@ class RenderImageToResponseTest(unittest.TestCase):
         result = views.render_image_to_response("foo.jpg")
         self.assertEquals("image/jpg", result['content-type'])
 
-
 class ResizeUrlTest(unittest.TestCase):
     file_name_without_extension = "test"
     width = u'100'
@@ -310,3 +310,29 @@ class ResizeUrlTest(unittest.TestCase):
         result = self.client.get("/test.100x200.")
 
         self.assertEquals(404, result.status_code)
+        
+class ResizeFilterTest(unittest.TestCase):
+    
+    def test_should_rewrite_url_with_given_size(self):
+        result = resize("http://www.test.com/file.jpg", "100x300")
+        self.assertEquals("http://www.test.com/file.100x300.jpg", result)
+    
+    def test_should_work_without_file_ending(self):
+        result = resize("http://www.test.com/file", "100x300")
+        self.assertEquals("http://www.test.com/file.100x300", result)
+
+    def test_should_work_with_absolute_paths(self):
+        result = resize("/file.jpg", "100x300")
+        self.assertEquals("/file.100x300.jpg", result)
+
+    def test_should_work_with_absolute_paths_without_fileendings(self):
+        result = resize("/file", "100x300")
+        self.assertEquals("/file.100x300", result)
+
+    def test_should_work_with_filename_alone(self):
+        result = resize("file.jpg", "100x300")
+        self.assertEquals("file.100x300.jpg", result)
+
+    def test_should_work_with_filename_alone_without_file_ending(self):
+        result = resize("file.jpg", "100x300")
+        self.assertEquals("file.100x300.jpg", result)
