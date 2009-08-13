@@ -19,16 +19,16 @@ for dirpath, dirnames, filenames in os.walk('imageservice'):
             pkg = pkg.replace(os.path.altsep, '.')
         packages.append(pkg)
 
-setup(name='django-imagemagick',
+setup(name='django-imageresize',
       version='0.1.1',
       description='Adds the possibility to scale images on server side using imagemagick',
       author='Tobias Hasselrot',
       author_email='tobias.hasselrot@gmail.com',
       url='',
-      download_url='http://github.com/mewantit/django-imagemagick/',
-      package_dir={'django-imagemagick': 'django-imagemagick'},
+      download_url='http://github.com/mewantit/django-imageresize/',
+      package_dir={'django-imagemagick': 'django-imageresize'},
       packages=packages,
-      package_data={'django-imagemagick': data_files},
+      package_data={'django-imageresize': data_files},
       classifiers=['Development Status :: 3 - Alpha',
                    'Environment :: Web Environment',
                    'Framework :: Django',

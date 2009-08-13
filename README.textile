@@ -1,10 +1,10 @@
-h1. Django-imagemagick
+h1. Django-imageresize
 
 h2. Introduction
 
-Django-imagemagick is an extension to the Django web framework that lets you resize images on server side just by specifying the size in the url. If you want to resize an image, @foo.png@, to 100x100 you simply just use the url @foo.100x100.png@ which makes it very easy to create for example thumbnails. 
+Django-imageresize is an extension to the Django web framework that lets you resize images on server side just by specifying the size in the url. If you want to resize an image, @foo.png@, to 100x100 you simply just use the url @foo.100x100.png@ which makes it very easy to create for example thumbnails. 
 
-The benefits of django-imagemagick are:
+The benefits of django-imageresize are:
 
 * Size is specified in link only, no dependecy on django templates
 * Images are resized using "Imagemagick":http://www.imagemagick.org which delivers excellent quality
@@ -35,13 +35,13 @@ h3. Install imagemagick
 
 Download and install Imagemagick from "Imagemagick official homepage":http://www.imagemagick.org
 
-h3. Install django-imagemagick
+h3. Install django-imageresize
 
-For now you need to install from source. Download the source from GitHub's "downloads page.":http://github.com/mewantit/django-imagemagick/downloads
+For now you need to install from source. Download the source from GitHub's "downloads page.":http://github.com/mewantit/django-imageresize/downloads
 
 In source directory run: <pre>> easy_install .</pre>
 
-h3. Add the django-imagemagick imageservice to your django application
+h3. Add the django-imageresize imageservice to your django application
 
 Add the @imageservice@ to the installed apps in your django application's @settings.py@:
 
