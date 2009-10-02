@@ -27,9 +27,9 @@ def resize(src, target, width, height):
         
         if not os.path.isdir(target_path):
             os.makedirs(target_path)
-        
-        with temp_file(target) as target: 
-            _image_magick_resize(src, target, width, height)
+      
+        with temp_file(target) as tmp_target: 
+            _image_magick_resize(src, tmp_target, width, height)
 
         shutil.copymode(src, target)
  
