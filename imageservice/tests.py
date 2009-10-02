@@ -68,10 +68,10 @@ class ImageMagickResizeTest(unittest.TestCase):
         
     def test_should_work_on_temporary_file(self):
         temp_file = self.tmp_dir + "/tempfile.png"
-        
         @contextmanager
         def mock_temp_file(target): 
-            yield temp_file 
+            yield temp_file
+            open(target, 'a').close() # create dummy target
 
         imagemagick.temp_file = mock_temp_file
         imagemagick.resize(self.source, self.target, 320, 200)
