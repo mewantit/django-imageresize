@@ -9,6 +9,7 @@ import shutil
 import unittest
 from contextlib import contextmanager
 from django.conf import settings
+import stat
 root = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
 settings.configure(RESIZE_MAX_HEIGHT=2048,RESIZE_MAX_WIDTH=2048,
                    MEDIA_ROOT="",
@@ -76,6 +77,16 @@ class ImageMagickResizeTest(unittest.TestCase):
         imagemagick.resize(self.source, self.target, 320, 200)
         self.assertTrue(os.path.isfile(temp_file))
         
+    def test_should_keep_permissisions_of_source_file(self):
+	original_mode = os.stat(self.source).st_mode
+	try:
+	    os.chmod(self.source, original_mode|stat.S_IXUSR)
+            imagemagick.resize(self.source, self.target, 320, 200)
+	    self.assertEquals(os.stat(self.source).st_mode, os.stat(self.target).st_mode)    
+        finally:
+            os.chmod(self.source, original_mode)
+
+
 class TemporaryFileTest(unittest.TestCase):
    
     def setUp(self):
@@ -132,8 +143,7 @@ class TemporaryFileTest(unittest.TestCase):
         with imagemagick.temp_file(self.target) as result:
             self.assertEquals(self.target.split('.')[-1], result.split('.')[-1])
             open(result, 'w').write("hello")
-                
-        
+
 class ResizeImageViewTest(unittest.TestCase):
     
     def setUp(self):

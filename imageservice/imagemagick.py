@@ -30,6 +30,8 @@ def resize(src, target, width, height):
         
         with temp_file(target) as target: 
             _image_magick_resize(src, target, width, height)
+
+        shutil.copymode(src, target)
  
 @contextmanager
 def temp_file(target):
