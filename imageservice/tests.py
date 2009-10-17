@@ -344,5 +344,5 @@ class ResizeFilterTest(unittest.TestCase):
         self.assertEquals("file.100x300.jpg", result)
 
     def test_should_work_with_filename_alone_without_file_ending(self):
-        result = resize("file.jpg", "100x300")
-        self.assertEquals("file.100x300.jpg", result)
+        result = resize("file", "100x300")
+        self.assertEquals("file.100x300", result)
