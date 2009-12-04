@@ -27,7 +27,7 @@ def resize(src, target, width, height):
 def execute(command, src, target):
     if os.path.isfile(target):
         return
-    _findAndVerifySource(src)
+    src = _findAndVerifySource(src)
     _prepareTargetFolder(target)        
     _callImageMagick(command, src, target);
     
@@ -41,7 +41,7 @@ def _findAndVerifySource(src):
         
     
 def _hasExtension(file):
-    return re.match('^.*\.\w{3-4}$', file)
+    return re.match(r'.*\.\w{3,4}', file)
 
 exts = ('.png', '.jpg', '.jpeg', '.gif')
 def _guessAndAppendExtension(srcWithoutExtension):
