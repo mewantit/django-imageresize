@@ -234,12 +234,11 @@ class ResizeImageViewTest(unittest.TestCase):
     
         self.assertEquals(source_file.split('.')[0], target_file.split('.')[0])
 
-    def test_file_extension_of_source_and_resized_image_should_be_the_same(self):
+    def test_file_extension_of_source_should_be_ignored(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
         (_, source_file) = os.path.split(result['source_file'])
-        (_, target_file) = os.path.split(result['target_file'])
-    
-        self.assertEquals(source_file.split('.')[-1], target_file.split('.')[-1])
+        (_, sourceWithoutExt) = os.path.split(self.file_name_without_extension)
+        self.assertEquals(sourceWithoutExt, source_file)
     
     def test_should_append_image_size_to_resized_image(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)

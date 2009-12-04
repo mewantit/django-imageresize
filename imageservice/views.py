@@ -11,7 +11,7 @@ def execute_template(request, file_name_without_extension, template_name, file_e
     except Exception, e:
         raise Http404(e)
     
-    source_file = "%s/%s%s" % (settings.MEDIA_ROOT, file_name_without_extension, file_extension)
+    source_file = "%s/%s" % (settings.MEDIA_ROOT, file_name_without_extension)
     target_file = "%s/%s.%s%s" % (settings.MEDIA_CACHE_ROOT, file_name_without_extension, template_name, file_extension)   
     
     try:
@@ -29,7 +29,7 @@ def resize_image(request, file_name_without_extension, width, height, file_exten
     if height > settings.RESIZE_MAX_HEIGHT or width > settings.RESIZE_MAX_WIDTH:
         raise Http404
     
-    source_file = "%s/%s%s" % (settings.MEDIA_ROOT, file_name_without_extension, file_extension)
+    source_file = "%s/%s" % (settings.MEDIA_ROOT, file_name_without_extension)
     target_file = "%s/%s.%dx%d%s" % (settings.MEDIA_CACHE_ROOT, file_name_without_extension, width, height, file_extension)   
     
     try:

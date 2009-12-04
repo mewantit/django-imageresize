@@ -6,26 +6,6 @@ import tempfile
 import shutil
 
 from contextlib import contextmanager
-    
-def execute(command, src, target):    
-    if not os.path.isfile(src):
-        raise IOError("Source image not found: %s" % src)
-    
-    if os.path.isfile(target):
-        return
-    
-    (target_path, _) = os.path.split(target)
-    
-    if not os.path.isdir(target_path):
-        os.makedirs(target_path)
-  
-    with temp_file(target) as tmp_target: 
-        args = ['convert', src] + command.split('  ')
-        args.append(tmp_target)
-        subprocess.check_call(args)
-
-    shutil.copymode(src, target)
-    
 
 def resize(src, target, width, height):
     """ Resizes a source image to given dimensions and stores the resized image as target
@@ -42,6 +22,48 @@ def resize(src, target, width, height):
     command = '-trim  -resize  %dx%d>  -size  %dx%d  xc:white  +swap  -gravity  center  -composite' % (width, height, width, height)
     
     execute(command, src, target);
+    
+def execute(command, src, target):
+    if os.path.isfile(target):
+        return
+    _findAndVerifySource(src)
+    _prepareTargetFolder(target)        
+    _callImageMagick(command, src, target);
+    
+def _findAndVerifySource(src):
+    if (_hasExtension(src)):
+        if not os.path.isfile(src):
+            raise IOError("Source image not found: %s." % src)
+        return src
+    else:
+        return _guessAndAppendExtension(src);
+        
+    
+def _hasExtension(file):
+    return '.' in file
+
+exts = ('.png', '.jpg', '.jpeg', '.gif')
+def _guessAndAppendExtension(srcWithoutExtension):
+    for ext in exts:
+        file = srcWithoutExtension + ext
+        if (os.path.isfile(file)):
+            return file
+        
+    raise IOError("Source image not found: %s. Tried with following extensions: %s" %(srcWithoutExtension,", ".join(exts)) ) 
+
+def _prepareTargetFolder(target):
+    (target_path, _) = os.path.split(target)
+    
+    if not os.path.isdir(target_path):
+        os.makedirs(target_path)
+        
+def _callImageMagick(command, src, target):
+    with temp_file(target) as tmp_target: 
+        args = ['convert', src] + command.split('  ')
+        args.append(tmp_target)
+        subprocess.check_call(args)
+
+    shutil.copymode(src, target)
     
     
  
