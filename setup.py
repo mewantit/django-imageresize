@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(name='django-imageresize',
-      version='0.1.4',
+      version='0.1.5',
       description='Adds the possibility to scale images on server side using imagemagick',
-      author=['Tobias Hasselrot', 'Daniel Hasselrot'],
+      author=['Tobias Hasselrot', 'Daniel Hasselrot', 'William Sporrong'],
       author_email='tobias.hasselrot@gmail.com',
       url='',
       download_url='http://github.com/mewantit/django-imageresize/',
