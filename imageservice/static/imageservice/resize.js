@@ -1,6 +1,6 @@
 // Functions for appending size information on a URL
-resize = function(url, width, height) {
-    return template( url, width.toString() + "x" + height.toString() );
+resize = function(url, width, height, extension) {
+    return template( url, width.toString() + "x" + height.toString(), extension );
 }
 
 _getFile = function(url) {
@@ -23,7 +23,8 @@ File = function(path, name, extension) {
 	this.extension = extension || "";
 }
 
-template = function(url, templateName) {
+template = function(url, templateName, targetExtension) {
 	var f = _getFile(url);
-    return f.path + f.name + "." + templateName + f.extension;
+	targetExtension = targetExtension || f.extension;
+    return f.path + f.name + "." + templateName + targetExtension;
 }

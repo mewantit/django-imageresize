@@ -39,6 +39,11 @@
         var result = resize("file", 100, 300);
          equals(result, "file.100x300");
      });
+     
+     test("should work with provided extension", function() {
+        var result = resize("file.jpg", 100, 300, ".png");
+         equals(result, "file.100x300.png");
+     });
   });
 
   </script>
