@@ -1,8 +1,5 @@
 from __future__ import with_statement
-
-from imageservice import views, imagemagick
 from nose.tools import raises
-from imageservice.templatetags.image_service import resize
 import os
 import tempfile
 import shutil
@@ -18,8 +15,12 @@ settings.configure(RESIZE_MAX_HEIGHT=2048,RESIZE_MAX_WIDTH=2048,
                    DATABASE_ENGINE='dummy',
                    INSTALLED_APP= ("imageservice"),
                    DEBUG=True,
-                   ROOT_URLCONF='imageservice.urls')
-
+                   ROOT_URLCONF='imageservice.urls',
+                   TEMPLATE_DIRS = (os.path.join(root, 'test_settings'),)
+                   )
+from imageservice import views, imagemagick
+from imageservice.template_repository import TemplateRepository
+from imageservice.templatetags.image_service import resize
 from django.http import Http404, HttpResponse
 from django.test.client import Client
 
@@ -42,6 +43,9 @@ class ImageMagickResizeTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
         imagemagick.temp_file = self.old_temp_file
+    
+    def test_should_work_with_arbitary_command(self):
+        imagemagick.execute('-matte  -fill  none  -draw  matte 0,0 floodfill', self.source, self.target)
     
     def test_should_create_a_new_resized_image_on_disk(self):
         imagemagick.resize(self.source, self.target, 320, 200)
@@ -250,7 +254,14 @@ class ResizeImageViewTest(unittest.TestCase):
     def test_should_render_resized_image_to_http_response(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
         self.assertTrue(result['rendered_to_http_response'])
-                
+
+class TemplatesRepositoryTest(unittest.TestCase):
+    
+    def setUp(self):
+        self.templateRepo = TemplateRepository()
+        
+    def test_get_template_returns_expected_value(self):
+        self.assertEquals('arg1  arg2', self.templateRepo.getTemplate('TEST'))
             
 class MockFile(object):
     def __init__(self, file_name):

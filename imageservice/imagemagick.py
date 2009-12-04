@@ -6,6 +6,26 @@ import tempfile
 import shutil
 
 from contextlib import contextmanager
+    
+def execute(command, src, target):    
+    if not os.path.isfile(src):
+        raise IOError("Source image not found: %s" % src)
+    
+    if os.path.isfile(target):
+        return
+    
+    (target_path, _) = os.path.split(target)
+    
+    if not os.path.isdir(target_path):
+        os.makedirs(target_path)
+  
+    with temp_file(target) as tmp_target: 
+        args = ['convert', src] + command.split('  ')
+        args.append(tmp_target)
+        subprocess.check_call(args)
+
+    shutil.copymode(src, target)
+    
 
 def resize(src, target, width, height):
     """ Resizes a source image to given dimensions and stores the resized image as target
@@ -19,19 +39,11 @@ def resize(src, target, width, height):
         height: Height of the resized image.
     
     """
-    if not os.path.isfile(src):
-        raise IOError("Source image not found: %s" % src)
+    command = '-trim  -resize  %dx%d>  -size  %dx%d  xc:white  +swap  -gravity  center  -composite' % (width, height, width, height)
     
-    if not os.path.isfile(target):
-        (target_path, _) = os.path.split(target)
-        
-        if not os.path.isdir(target_path):
-            os.makedirs(target_path)
-      
-        with temp_file(target) as tmp_target: 
-            _image_magick_resize(src, tmp_target, width, height)
-
-        shutil.copymode(src, target)
+    execute(command, src, target);
+    
+    
  
 @contextmanager
 def temp_file(target):
@@ -46,13 +58,7 @@ def temp_file(target):
         yield temp
         _replace_target_file_with_temp_file(temp, target)    
     finally:
-        _remove_tempfile(temp)
-
- 
-def _image_magick_resize(src, target, width, height):
-    subprocess.check_call(['convert', src, '-trim', '-resize', '%dx%d>' % (width, height),
-                           '-size','%dx%d' % (width, height), 'xc:white', '+swap',
-                           '-gravity', 'center', '-composite', target])
+        _remove_tempfile(temp)   
 
 def _create_tempfile_for_target(target):
     (_, target_filename) = os.path.split(target)    

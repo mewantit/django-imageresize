@@ -1,7 +1,27 @@
 from django.http import HttpResponse, Http404
+from imageservice.template_repository import TemplateRepository
 import imagemagick
 from django.conf import settings
 
+templatesRepo = TemplateRepository()
+
+def execute_template(request, file_name_without_extension, template_name, file_extension):
+    try:
+        command  = templatesRepo.getTemplate(template_name)
+    except Exception, e:
+        raise Http404(e)
+    
+    source_file = "%s/%s%s" % (settings.MEDIA_ROOT, file_name_without_extension, file_extension)
+    target_file = "%s/%s.%s%s" % (settings.MEDIA_CACHE_ROOT, file_name_without_extension, template_name, file_extension)   
+    
+    try:
+        imagemagick.execute(command, source_file, target_file)    
+    except Exception, e:
+        raise Http404(e)
+        
+    return render_image_to_response(target_file)
+ 
+    
 def resize_image(request, file_name_without_extension, width, height, file_extension):
     width = int(width)
     height = int(height)
