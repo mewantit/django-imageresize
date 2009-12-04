@@ -4,6 +4,7 @@ import os
 import subprocess
 import tempfile
 import shutil
+import re
 
 from contextlib import contextmanager
 
@@ -40,7 +41,7 @@ def _findAndVerifySource(src):
         
     
 def _hasExtension(file):
-    return '.' in file
+    return re.match('^.*\.\w{3-4}$', file)
 
 exts = ('.png', '.jpg', '.jpeg', '.gif')
 def _guessAndAppendExtension(srcWithoutExtension):
