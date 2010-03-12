@@ -47,6 +47,7 @@ exts = ('.png', '.jpg', '.jpeg', '.gif')
 def _guessAndAppendExtension(srcWithoutExtension):
     for ext in exts:
         file = srcWithoutExtension + ext
+        
         if (os.path.isfile(file)):
             return file
         

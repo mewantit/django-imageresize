@@ -30,6 +30,9 @@ def resize_image(request, file_name_without_extension, width, height, file_exten
         raise Http404
     
     source_file = "%s/%s" % (settings.MEDIA_ROOT, file_name_without_extension)
+    if file_extension:
+        source_file += file_extension
+
     target_file = "%s/%s.%dx%d%s" % (settings.MEDIA_CACHE_ROOT, file_name_without_extension, width, height, file_extension)   
     
     try:

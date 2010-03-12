@@ -95,7 +95,7 @@ class ImageMagickResizeTest(unittest.TestCase):
         target = self.tmp_dir + "/Case.PNG"
         imagemagick.resize(source, target, 320, 200)
         self.assertTrue(os.path.isfile(target))
-    
+        
             
 class TemporaryFileTest(unittest.TestCase):
    
@@ -240,12 +240,6 @@ class ResizeImageViewTest(unittest.TestCase):
     
         self.assertEquals(source_file.split('.')[0], target_file.split('.')[0])
 
-    def test_file_extension_of_source_should_be_ignored(self):
-        result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
-        (_, source_file) = os.path.split(result['source_file'])
-        (_, sourceWithoutExt) = os.path.split(self.file_name_without_extension)
-        self.assertEquals(sourceWithoutExt, source_file)
-    
     def test_should_append_image_size_to_resized_image(self):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
         (_, file_name) = os.path.split(result['target_file'])
@@ -262,8 +256,12 @@ class ResizeImageViewTest(unittest.TestCase):
 
     def test_should_be_case_sensitive(self):
         result = views.resize_image(None, "Case", self.width, self.height, ".PNG")
-        (_, file_name) = os.path.split(result['target_file'])
-        self.assertEquals("Case.100x200.PNG", file_name)
+        (_, source_file_name) = os.path.split(result['source_file'])
+        (_, target_file_name) = os.path.split(result['target_file'])
+        
+        self.assertEquals("Case.PNG", source_file_name)
+        self.assertEquals("Case.100x200.PNG", target_file_name)
+        
    
 
 class TemplatesRepositoryTest(unittest.TestCase):
