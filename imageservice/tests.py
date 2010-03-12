@@ -1,5 +1,6 @@
 from __future__ import with_statement
 from nose.tools import raises
+
 import os
 import tempfile
 import shutil
@@ -12,7 +13,7 @@ settings.configure(RESIZE_MAX_HEIGHT=2048,RESIZE_MAX_WIDTH=2048,
                    MEDIA_ROOT="",
                    MEDIA_CACHE_ROOT="",
                    TEST_MEDIA_ROOT=os.path.join(root, 'test_media'),
-                   DATABASE_ENGINE='dummy',
+                   DATABASE_ENGINE=None,
                    INSTALLED_APP= ("imageservice"),
                    DEBUG=True,
                    ROOT_URLCONF='imageservice.urls',
@@ -23,7 +24,6 @@ from imageservice.template_repository import TemplateRepository
 from imageservice.templatetags.image_service import resize
 from django.http import Http404, HttpResponse
 from django.test.client import Client
-
 class ImageMagickResizeTest(unittest.TestCase):
     
     def setUp(self):
@@ -82,15 +82,21 @@ class ImageMagickResizeTest(unittest.TestCase):
         self.assertTrue(os.path.isfile(temp_file))
         
     def test_should_keep_permissisions_of_source_file(self):
-	original_mode = os.stat(self.source).st_mode
-	try:
-	    os.chmod(self.source, original_mode|stat.S_IXUSR)
+        original_mode = os.stat(self.source).st_mode
+        try:
+            os.chmod(self.source, original_mode|stat.S_IXUSR)
             imagemagick.resize(self.source, self.target, 320, 200)
-	    self.assertEquals(os.stat(self.source).st_mode, os.stat(self.target).st_mode)    
+            self.assertEquals(os.stat(self.source).st_mode, os.stat(self.target).st_mode)    
         finally:
             os.chmod(self.source, original_mode)
-
-
+    
+    def test_should_be_case_sensitive(self):
+        source = settings.TEST_MEDIA_ROOT + "/Case.PNG"
+        target = self.tmp_dir + "/Case.PNG"
+        imagemagick.resize(source, target, 320, 200)
+        self.assertTrue(os.path.isfile(target))
+    
+            
 class TemporaryFileTest(unittest.TestCase):
    
     def setUp(self):
@@ -254,6 +260,12 @@ class ResizeImageViewTest(unittest.TestCase):
         result = views.resize_image(None, self.file_name_without_extension, self.width, self.height, self.file_extension)
         self.assertTrue(result['rendered_to_http_response'])
 
+    def test_should_be_case_sensitive(self):
+        result = views.resize_image(None, "Case", self.width, self.height, ".PNG")
+        (_, file_name) = os.path.split(result['target_file'])
+        self.assertEquals("Case.100x200.PNG", file_name)
+   
+
 class TemplatesRepositoryTest(unittest.TestCase):
     
     def setUp(self):
@@ -286,28 +298,28 @@ class RenderImageToResponseTest(unittest.TestCase):
         result = views.render_image_to_response("foo.jpg")
         self.assertEquals("image/jpg", result['content-type'])
 
+
 class ResizeUrlTest(unittest.TestCase):
-    file_name_without_extension = "test"
-    width = u'100'
-    height = u'200'
-    file_extension = ".jpg"
     
     def setUp(self):
-        
+        ResizeUrlTest.file_name_without_extension = "test"
+        ResizeUrlTest.width = u'100'
+        ResizeUrlTest.height = u'200'
+        ResizeUrlTest.file_extension = ".jpg"
+
         self.old_resize_image = views.resize_image
-        
         def mock_resize_image(request, file_name_without_extension, width, height, file_extension):
-            self.assertEquals(self.file_name_without_extension, file_name_without_extension)
-            self.assertEquals(self.width, width)
-            self.assertEquals(self.height, height) 
-            self.assertEquals(self.file_extension, file_extension)
+            self.assertEquals(ResizeUrlTest.file_name_without_extension, file_name_without_extension)
+            self.assertEquals(ResizeUrlTest.width, width)
+            self.assertEquals(ResizeUrlTest.height, height) 
+            self.assertEquals(ResizeUrlTest.file_extension, file_extension)
             return HttpResponse()
-        
+
         views.resize_image = mock_resize_image
         
-        self.client = Client()
+        self.client = Client();
         
-    def tearDown(self):        
+    def tearDown(self):  
         views.resize_image = self.old_resize_image 
     
     def test_should_support_images_with_extensions(self):
@@ -316,8 +328,10 @@ class ResizeUrlTest(unittest.TestCase):
         self.assertEquals(200, result.status_code)
         
     def test_should_support_images_without_extensions(self):
+    
         ResizeUrlTest.file_extension = ""
         result = self.client.get("/test.100x200")
+        
         self.assertEquals(200, result.status_code)
     
     def test_should_not_support_images_with_special_characters_in_extension(self):
@@ -330,6 +344,12 @@ class ResizeUrlTest(unittest.TestCase):
         result = self.client.get("/test.100x200.")
 
         self.assertEquals(404, result.status_code)
+   
+    def test_should_be_case_sensitive(self):
+        ResizeUrlTest.file_name_without_extension = "UpperCase"
+        ResizeUrlTest.file_extension = ".PNG"
+        result = self.client.get("/UpperCase.100x200.PNG")
+        self.assertEquals(200, result.status_code)
         
 class ResizeFilterTest(unittest.TestCase):
     
