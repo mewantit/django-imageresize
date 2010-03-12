@@ -1,8 +1,10 @@
 *.pyc
 ~*
 *~
+/build
 .project
 .pydevproject
 pip-log.txt
 */ENV
+/django_imageresize.egg-info
 .DS_Store
