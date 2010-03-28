@@ -45,11 +45,16 @@ def _hasExtension(file):
 
 exts = ('.png', '.jpg', '.jpeg', '.gif')
 def _guessAndAppendExtension(srcWithoutExtension):
-    for ext in exts:
-        file = srcWithoutExtension + ext
+    def allcases(extension):
+        yield extension
+        yield extension.upper()        
+
+    for extension in exts:
+        for ext in allcases(extension):
+            file = srcWithoutExtension + ext
         
-        if (os.path.isfile(file)):
-            return file
+            if (os.path.isfile(file)):
+                return file
         
     raise IOError("Source image not found: %s. Tried with following extensions: %s" %(srcWithoutExtension,", ".join(exts)) ) 
 

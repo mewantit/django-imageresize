@@ -96,7 +96,12 @@ class ImageMagickResizeTest(unittest.TestCase):
         imagemagick.resize(source, target, 320, 200)
         self.assertTrue(os.path.isfile(target))
         
-            
+    def test_should_match_both_upper_and_lower_cases_when_no_extension_is_provided(self):
+        source = settings.TEST_MEDIA_ROOT + "/Case"
+        target = self.tmp_dir + "/Case.PNG"
+        imagemagick.resize(source, target, 320, 200)
+        self.assertTrue(os.path.isfile(target))
+  
 class TemporaryFileTest(unittest.TestCase):
    
     def setUp(self):
